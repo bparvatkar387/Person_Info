@@ -320,38 +320,71 @@ public class GateOutPerson extends AppCompatActivity {
                 gender = "x";
         }
 
-        calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-
-        //setting gate out time
-        if(!gateOutHr.equals("")) {
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(gateOutHr));
-        }
-        if(!gateOutMin.equals("")) {
-            calendar.set(Calendar.MINUTE, Integer.parseInt(gateOutMin));
-        }
-
+        // if gate out data is filled and gate in data is not filled
+        // it means its gate out time
+        String customDate = "2000-01-01 00:00:00";
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        gateOutDT = dateFormat.format(calendar.getTime());
+        if((!gateOutHr.equals("") && !gateOutMin.equals("")) && (gateInHr.equals("") && gateInMin.equals(""))) {
 
-        //setting gate in time
-        if(gateInHr.equals("") && gateInMin.equals("")) {
-            String customDate = "2000-01-01 00:00:00";
+            calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(gateOutHr));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(gateOutMin));
+            gateOutDT = dateFormat.format(calendar.getTime());
+
+
             try {
                 Date dateCustom = dateFormat.parse(customDate);
-                calendar.setTime(dateCustom);
+                if (dateCustom != null) {
+                    calendar.setTime(dateCustom);
+                    gateInDT = dateFormat.format(dateCustom);
+                }
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        } else {
+
+        }
+
+        //if gate out is empty and gate in is filled
+        //is means it gate in time
+        if ((gateOutHr.equals("") && gateOutMin.equals("")) && (!gateInHr.equals("") && !gateInMin.equals(""))) {
+            calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(gateInHr));
             calendar.set(Calendar.MINUTE, Integer.parseInt(gateInMin));
+
+            gateInDT = dateFormat.format(calendar.getTime());
+
+            try {
+                Date dateCustom = dateFormat.parse(customDate);
+                if (dateCustom != null) {
+                    calendar.setTime(dateCustom);
+                    gateOutDT = dateFormat.format(dateCustom);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
         }
-        gateInDT = dateFormat.format(calendar.getTime());
+
+        // if both gate out and gate in is filled
+        if((!gateOutHr.equals("") && !gateOutMin.equals("")) && (!gateInHr.equals("") && !gateInMin.equals(""))) {
+
+            calendar = Calendar.getInstance();
+
+            //setting gate out time
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(gateOutHr));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(gateOutMin));
+            gateOutDT = dateFormat.format(calendar.getTime());
+
+            //setting gate in time
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(gateInHr));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(gateInMin));
+            gateInDT = dateFormat.format(calendar.getTime());
+        }
 
         System.out.println("gateout: " + gateOutDT);
-        System.out.println("gatein: " + gateInDT);
+        System.out.println("register: " + gateInDT);
     }
 
     private void storeDetails() {
@@ -409,11 +442,6 @@ public class GateOutPerson extends AppCompatActivity {
 
         if((!gateInHrET.getText().toString().equals("") && gateInMinET.getText().toString().equals("")) || (gateInHrET.getText().toString().equals("") && !gateInMinET.getText().toString().equals(""))){
             Toast.makeText(getApplicationContext(), "Fill both hours and min in Gate In Time", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if(gateOutTempET.getText().toString().equals("") && gateInTempET.getText().toString().equals("")){
-            Toast.makeText(getApplicationContext(), "Enter Gate Out Temperature or Gate In Temperature", Toast.LENGTH_SHORT).show();
             return false;
         }
 
